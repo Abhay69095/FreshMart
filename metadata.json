@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix FreshMart - Online Fresh Produce \u0026 Local Vendor Store",
+  "description": "A full-stack e-commerce platform connecting local fresh fruit and vegetable vendors with customers for quick delivery, cart, checkout, order tracking, and vendor management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

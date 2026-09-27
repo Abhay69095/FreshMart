@@ -1,0 +1,1282 @@
+import bcrypt from 'bcryptjs';
+import { db } from './dbStore.js';
+
+export const seedDatabaseIfEmpty = async () => {
+  const users = db.getCollection('users');
+  const products = db.getCollection('products');
+
+  // If already seeded and has products, don't overwrite unless explicitly requested
+  if (users.length > 0 && products.length >= 20) {
+    return;
+  }
+
+  console.log('[Seed] Seeding FreshMart with initial demo data...');
+
+  const passwordHashAdmin = bcrypt.hashSync('admin123', 10);
+  const passwordHashCustomer = bcrypt.hashSync('customer123', 10);
+
+  // 1. Users
+  const seedUsers = [
+    {
+      _id: 'user_admin_01',
+      name: 'Ramesh Patel (Vendor/Admin)',
+      email: 'admin@freshmart.com',
+      password: passwordHashAdmin,
+      role: 'admin',
+      phone: '+91 98201 12345',
+      address: {
+        house: 'Shop No. 4, Market Yard',
+        street: 'Station Road',
+        area: 'Palghar West',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Opposite Railway Station'
+      }
+    },
+    {
+      _id: 'user_cust_01',
+      name: 'Rahul Sharma',
+      email: 'rahul@freshmart.com',
+      password: passwordHashCustomer,
+      role: 'customer',
+      phone: '+91 98765 43210',
+      address: {
+        house: 'Flat 402, Gokul Residency',
+        street: 'Manor Road',
+        area: 'Navali',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near D-Mart'
+      }
+    },
+    {
+      _id: 'user_cust_02',
+      name: 'Priya Verma',
+      email: 'priya@gmail.com',
+      password: passwordHashCustomer,
+      role: 'customer',
+      phone: '+91 98111 22334',
+      address: {
+        house: 'Bungalow 12, Sunshine Colony',
+        street: 'Kelve Road',
+        area: 'Shirgaon',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401405',
+        landmark: 'Behind Saraswati School'
+      }
+    },
+    {
+      _id: 'user_cust_03',
+      name: 'Amit Joshi',
+      email: 'amit.j@yahoo.com',
+      password: passwordHashCustomer,
+      role: 'customer',
+      phone: '+91 99223 34455',
+      address: {
+        house: 'Row House 5, Green Meadows',
+        street: 'Mahim Road',
+        area: 'Tembi',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near Sai Baba Mandir'
+      }
+    },
+    {
+      _id: 'user_cust_04',
+      name: 'Sneha Kulkarni',
+      email: 'sneha.k@outlook.com',
+      password: passwordHashCustomer,
+      role: 'customer',
+      phone: '+91 97654 32190',
+      address: {
+        house: 'A-201, Royal Palms',
+        street: 'Boisar Link Road',
+        area: 'Palghar East',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near Municipal Garden'
+      }
+    },
+    {
+      _id: 'user_cust_05',
+      name: 'Vikram Deshmukh',
+      email: 'vikram.d@gmail.com',
+      password: passwordHashCustomer,
+      role: 'customer',
+      phone: '+91 98450 98765',
+      address: {
+        house: 'Plot 88, Sahyadri Nagar',
+        street: 'Old Post Office Lane',
+        area: 'Palghar City',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Opposite State Bank'
+      }
+    }
+  ];
+
+  // 2. Categories (8 required)
+  const seedCategories = [
+    {
+      _id: 'cat_fruits',
+      name: 'Fresh Fruits',
+      slug: 'fresh-fruits',
+      description: 'Handpicked orchard-fresh seasonal and exotic fruits',
+      icon: 'Apple',
+      image: '/src/assets/images/seasonal_fruits_basket_1790440987001.jpg',
+      itemCount: 9
+    },
+    {
+      _id: 'cat_vegetables',
+      name: 'Fresh Vegetables',
+      slug: 'fresh-vegetables',
+      description: 'Crisp farm-fresh everyday vegetables delivered daily',
+      icon: 'Carrot',
+      image: '/src/assets/images/fresh_vegetables_assortment_1790441003951.jpg',
+      itemCount: 10
+    },
+    {
+      _id: 'cat_leafy',
+      name: 'Leafy Greens',
+      slug: 'leafy-greens',
+      description: 'Nutrient-rich washed greens, herbs and seasonal leaves',
+      icon: 'Salad',
+      image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600&auto=format&fit=crop&q=80',
+      itemCount: 3
+    },
+    {
+      _id: 'cat_roots',
+      name: 'Roots & Tubers',
+      slug: 'roots-tubers',
+      description: 'Earthy potatoes, sweet potatoes, onions and root veggies',
+      icon: 'Wheat',
+      image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80',
+      itemCount: 3
+    },
+    {
+      _id: 'cat_exotic',
+      name: 'Exotic & Seasonal',
+      slug: 'exotic-seasonal',
+      description: 'Premium seasonal imports and native specialty harvests',
+      icon: 'Sparkles',
+      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600&auto=format&fit=crop&q=80',
+      itemCount: 4
+    },
+    {
+      _id: 'cat_herbs',
+      name: 'Herbs & Seasoning',
+      slug: 'herbs-seasoning',
+      description: 'Fresh chillies, coriander, ginger, mint, and garlic cloves',
+      icon: 'Flame',
+      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80',
+      itemCount: 3
+    },
+    {
+      _id: 'cat_organic',
+      name: 'Organic Specials',
+      slug: 'organic-specials',
+      description: 'Zero chemical pesticide certified organic products',
+      icon: 'Leaf',
+      image: '/src/assets/images/vendor_storefront_1790440973790.jpg',
+      itemCount: 5
+    },
+    {
+      _id: 'cat_citrus',
+      name: 'Citrus & Berries',
+      slug: 'citrus-berries',
+      description: 'Vitamin C rich oranges, lemons, sweet lime, and fresh grapes',
+      icon: 'Sun',
+      image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=600&auto=format&fit=crop&q=80',
+      itemCount: 3
+    }
+  ];
+
+  // 3. Products (24+ realistic products across fruits & vegetables)
+  const seedProducts = [
+    // Fruits
+    {
+      _id: 'prod_apple_shimla',
+      name: 'Shimla Royal Apple',
+      description: 'Crisp, sweet and juicy red apples sourced directly from Himachal orchard growers. Rich in dietary fiber and antioxidants.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop&q=80',
+      price: 180,
+      discountPrice: 150,
+      unit: '1 kg',
+      stockQuantity: 45,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Harvested Yesterday',
+      isSeasonal: true,
+      isOrganic: false,
+      rating: 4.8,
+      reviewsCount: 34,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_banana_robusta',
+      name: 'Robusta Golden Banana',
+      description: 'Naturally ripened, naturally sweet bananas from Jalgaon plantations. Excellent source of potassium and instant morning energy.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600&auto=format&fit=crop&q=80',
+      price: 60,
+      discountPrice: 48,
+      unit: '1 kg',
+      stockQuantity: 80,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Today',
+      isSeasonal: false,
+      isOrganic: true,
+      rating: 4.9,
+      reviewsCount: 52,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_mango_alphonso',
+      name: 'Ratnagiri Alphonso Mango (Hapus)',
+      description: 'Authentic GI-tagged Ratnagiri Alphonso mangoes. Heavenly aroma, rich saffron-colored pulp with zero fiber.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=600&auto=format&fit=crop&q=80',
+      price: 850,
+      discountPrice: 720,
+      unit: '1 kg',
+      stockQuantity: 25,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Farm Fresh',
+      isSeasonal: true,
+      isOrganic: true,
+      rating: 5.0,
+      reviewsCount: 78,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_orange_nagpur',
+      name: 'Nagpur Sweet Orange (Santra)',
+      description: 'Juicy, tangy and refreshing oranges loaded with vitamin C from the orchards of Nagpur. Easy to peel and perfect for fresh juice.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=600&auto=format&fit=crop&q=80',
+      price: 110,
+      discountPrice: 90,
+      unit: '1 kg',
+      stockQuantity: 60,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Today',
+      isSeasonal: true,
+      isOrganic: false,
+      rating: 4.7,
+      reviewsCount: 29,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_grapes_green',
+      name: 'Nashik Thompson Green Grapes',
+      description: 'Seedless, crunchy and naturally sweet green table grapes picked at peak ripeness from Nashik vineyards.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600&auto=format&fit=crop&q=80',
+      price: 120,
+      discountPrice: 99,
+      unit: '500 g',
+      stockQuantity: 35,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Chilled Morning Harvest',
+      isSeasonal: true,
+      isOrganic: false,
+      rating: 4.6,
+      reviewsCount: 19,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_guava_white',
+      name: 'Allahabad Safeda Guava',
+      description: 'Firm and sweet white-fleshed guavas, rich in pectin and natural immunity-boosting nutrients.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1536511135899-7a544320955d?w=600&auto=format&fit=crop&q=80',
+      price: 90,
+      discountPrice: 75,
+      unit: '1 kg',
+      stockQuantity: 40,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Today',
+      isSeasonal: false,
+      isOrganic: true,
+      rating: 4.5,
+      reviewsCount: 14,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_papaya_red',
+      name: 'Red Lady Papaya',
+      description: 'Sweet, vibrant salmon-pink flesh papaya with smooth texture. Aids digestive health and gut wellness.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?w=600&auto=format&fit=crop&q=80',
+      price: 70,
+      discountPrice: 55,
+      unit: 'Per piece',
+      stockQuantity: 30,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Ripe & Ready to Cut',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.7,
+      reviewsCount: 22,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_watermelon_kiran',
+      name: 'Sweet Striped Watermelon',
+      description: 'Hydrating, deeply red and crispy sweet watermelon. Hand-thumped for optimal sugar maturity.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&auto=format&fit=crop&q=80',
+      price: 95,
+      discountPrice: 79,
+      unit: 'Per piece',
+      stockQuantity: 28,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Picked This Morning',
+      isSeasonal: true,
+      isOrganic: false,
+      rating: 4.8,
+      reviewsCount: 41,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_pomegranate_aril',
+      name: 'Bhagwa Ruby Pomegranate (Anar)',
+      description: 'Glossy red exterior bursting with sweet, seed-soft ruby arils. Excellent blood hemoglobin booster.',
+      category: 'Fresh Fruits',
+      categoryId: 'cat_fruits',
+      image: 'https://images.unsplash.com/photo-1541344999736-83eca272f6fc?w=600&auto=format&fit=crop&q=80',
+      price: 220,
+      discountPrice: 185,
+      unit: '1 kg',
+      stockQuantity: 22,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Grade A Export Quality',
+      isSeasonal: false,
+      isOrganic: true,
+      rating: 4.9,
+      reviewsCount: 36,
+      vendorId: 'user_admin_01'
+    },
+
+    // Vegetables
+    {
+      _id: 'prod_tomato_hybrid',
+      name: 'Fresh Farm Hybrid Tomato',
+      description: 'Firm, glossy and succulent red tomatoes ideal for salads, rich curries, and daily homestyle cooking.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80',
+      price: 50,
+      discountPrice: 40,
+      unit: '1 kg',
+      stockQuantity: 120,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Today',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.9,
+      reviewsCount: 95,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_onion_nashik',
+      name: 'Nashik Red Onion (Kanda)',
+      description: 'Pungent, dry-skinned, long-lasting red onions from the heartland of Nashik. A kitchen essential for every Indian dish.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80',
+      price: 45,
+      discountPrice: 38,
+      unit: '1 kg',
+      stockQuantity: 150,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Well Cured & Dry',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.8,
+      reviewsCount: 110,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_potato_jyoti',
+      name: 'Fresh Jyoti Potato (Aloo)',
+      description: 'Smooth, thin-skinned potatoes with low sugar content. Ideal for roasting, frying, mashing, and daily vegetable preparations.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80',
+      price: 40,
+      discountPrice: 32,
+      unit: '1 kg',
+      stockQuantity: 140,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Farm Fresh',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.7,
+      reviewsCount: 88,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_carrot_ooty',
+      name: 'Ooty Sweet Red Carrot',
+      description: 'Tender, crunchy and naturally sweet carrots rich in beta carotene. Perfect for raw salad crunch, juices, and gajar halwa.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=600&auto=format&fit=crop&q=80',
+      price: 70,
+      discountPrice: 58,
+      unit: '1 kg',
+      stockQuantity: 50,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Harvested Yesterday',
+      isSeasonal: true,
+      isOrganic: true,
+      rating: 4.8,
+      reviewsCount: 42,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_cabbage_green',
+      name: 'Crisp Green Cabbage (Patta Gobhi)',
+      description: 'Tightly packed, crisp green heads with a refreshing peppery crunch. Great for stir-fries, momos, and salads.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=600&auto=format&fit=crop&q=80',
+      price: 45,
+      discountPrice: 35,
+      unit: 'Per piece',
+      stockQuantity: 45,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Morning Pluck',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.6,
+      reviewsCount: 27,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_cauliflower_snowball',
+      name: 'Snowball Cauliflower (Phool Gobhi)',
+      description: 'Pristine white, dense curds framed by tender protective leaves. Pesticide residue-free and clean.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=600&auto=format&fit=crop&q=80',
+      price: 55,
+      discountPrice: 42,
+      unit: 'Per piece',
+      stockQuantity: 38,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Today',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.7,
+      reviewsCount: 31,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_spinach_palak',
+      name: 'Tender Baby Spinach (Palak)',
+      description: 'Dark green, mineral-dense tender leaves harvested with roots intact. Washed thoroughly for instant preparation.',
+      category: 'Leafy Greens',
+      categoryId: 'cat_leafy',
+      image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600&auto=format&fit=crop&q=80',
+      price: 35,
+      discountPrice: 28,
+      unit: '250 g',
+      stockQuantity: 6, // Low stock demo!
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Cut at Dawn Today',
+      isSeasonal: false,
+      isOrganic: true,
+      rating: 4.9,
+      reviewsCount: 64,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_brinjal_purple',
+      name: 'Small Purple Eggplant (Baingan)',
+      description: 'Glossy, tender small brinjals perfect for stuffed bharwa baingan or Maharashtrian vangi bhat.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1659261856736-a83d7350cb49?w=600&auto=format&fit=crop&q=80',
+      price: 60,
+      discountPrice: 49,
+      unit: '500 g',
+      stockQuantity: 32,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Today',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.5,
+      reviewsCount: 18,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_capsicum_green',
+      name: 'Shimla Green Bell Pepper (Capsicum)',
+      description: 'Thick-walled, crisp green capsicum with a delicate aroma. Adds crunch and vibrant flavor to stir fries and noodles.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=600&auto=format&fit=crop&q=80',
+      price: 75,
+      discountPrice: 60,
+      unit: '500 g',
+      stockQuantity: 28,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Hydroponic Quality',
+      isSeasonal: false,
+      isOrganic: true,
+      rating: 4.8,
+      reviewsCount: 39,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_green_chilli',
+      name: 'Spicy Green Chilli (Hari Mirch)',
+      description: 'Zesty, fiery fresh chillies that elevate every tempering and chutney. Hand-graded for firm texture.',
+      category: 'Herbs & Seasoning',
+      categoryId: 'cat_herbs',
+      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80',
+      price: 30,
+      discountPrice: 22,
+      unit: '250 g',
+      stockQuantity: 50,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Pungent & Crisp',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.7,
+      reviewsCount: 45,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_ginger_fresh',
+      name: 'Fresh Mahim Ginger (Adrak)',
+      description: 'Spicy, juicy washed ginger roots. Rich in gingerol for digestion, ayurvedic herbal teas, and daily tadka.',
+      category: 'Herbs & Seasoning',
+      categoryId: 'cat_herbs',
+      image: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80',
+      price: 60,
+      discountPrice: 48,
+      unit: '250 g',
+      stockQuantity: 4, // Low stock demo!
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Farm Cleansed',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.9,
+      reviewsCount: 32,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_coriander_leaves',
+      name: 'Fresh Country Coriander (Kothmir)',
+      description: 'Fragrant desi cilantro bunches with strong earthy aroma. Vital finishing garnish for all Indian delicacies.',
+      category: 'Leafy Greens',
+      categoryId: 'cat_leafy',
+      image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80',
+      price: 25,
+      discountPrice: 18,
+      unit: '250 g',
+      stockQuantity: 30,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Cut Today',
+      isSeasonal: false,
+      isOrganic: true,
+      rating: 4.8,
+      reviewsCount: 50,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_ladyfinger_bhindi',
+      name: 'Tender Fresh Okra (Bhindi)',
+      description: 'Bright green, snap-fresh ladyfingers without tough fibrous tips. Great for kurkuri bhindi and homestyle dry fry.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1425543103986-22abb7d7e8d2?w=600&auto=format&fit=crop&q=80',
+      price: 55,
+      discountPrice: 45,
+      unit: '500 g',
+      stockQuantity: 34,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Harvested Today',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.6,
+      reviewsCount: 24,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_cucumber_desi',
+      name: 'Crisp Green Salad Cucumber (Kakdi)',
+      description: 'Cooling, seed-light green cucumbers packed with natural hydration. Perfect for raita and midday detox snacks.',
+      category: 'Fresh Vegetables',
+      categoryId: 'cat_vegetables',
+      image: 'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=80',
+      price: 45,
+      discountPrice: 35,
+      unit: '500 g',
+      stockQuantity: 0, // Out of stock demo!
+      minOrderQuantity: 1,
+      isAvailable: false,
+      freshness: 'Morning Harvest',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.7,
+      reviewsCount: 28,
+      vendorId: 'user_admin_01'
+    },
+    {
+      _id: 'prod_lemon_yellow',
+      name: 'Juicy Kagzi Lemons (Nimbu)',
+      description: 'Thin-skinned, high-juice yield yellow lemons. Bursting with vitamin C and refreshing citrus oils.',
+      category: 'Citrus & Berries',
+      categoryId: 'cat_citrus',
+      image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=600&auto=format&fit=crop&q=80',
+      price: 30,
+      discountPrice: 20,
+      unit: '250 g',
+      stockQuantity: 70,
+      minOrderQuantity: 1,
+      isAvailable: true,
+      freshness: 'Fresh Plucked',
+      isSeasonal: false,
+      isOrganic: false,
+      rating: 4.8,
+      reviewsCount: 37,
+      vendorId: 'user_admin_01'
+    }
+  ];
+
+  // 4. Store / Vendor Profile
+  const seedStore = [
+    {
+      _id: 'store_freshmart_01',
+      storeName: 'FreshMart Local Products & Farm Outlet',
+      vendorName: 'Ramesh Patel & Sons',
+      location: 'Palghar, Maharashtra, India',
+      fullAddress: 'Shop No. 4, APMC Fruit & Vegetable Market Yard, Station Road, Palghar West - 401404',
+      phone: '+91 98201 12345',
+      supportEmail: 'contact@freshmart.com',
+      openingHours: '7:00 AM – 9:00 PM (All 7 Days)',
+      deliveryRadiusKm: 15,
+      deliveryFeeStandard: 40,
+      freeDeliveryThreshold: 499,
+      aboutVendor: 'FreshMart was started by local farming advocate Ramesh Patel to bridge local Palghar cultivators directly with neighborhood families. We eliminate multiple middlemen, ensuring farmers get fair prices while our customers receive crispy, morning-harvested products within 2 hours of packing.',
+      bannerImage: '/src/assets/images/vendor_storefront_1790440973790.jpg',
+      rating: 4.9,
+      totalOrdersFulfilled: 3420,
+      isAcceptingOrders: true
+    }
+  ];
+
+  // 5. Orders (10 realistic demo orders with diverse statuses)
+  const now = Date.now();
+  const oneHour = 3600 * 1000;
+  const oneDay = 24 * oneHour;
+
+  const seedOrders = [
+    {
+      _id: 'FM20261001',
+      customerId: 'user_cust_01',
+      customerName: 'Rahul Sharma',
+      customerEmail: 'rahul@freshmart.com',
+      customerPhone: '+91 98765 43210',
+      items: [
+        {
+          productId: 'prod_tomato_hybrid',
+          name: 'Fresh Farm Hybrid Tomato',
+          price: 40,
+          unit: '1 kg',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 80
+        },
+        {
+          productId: 'prod_onion_nashik',
+          name: 'Nashik Red Onion (Kanda)',
+          price: 38,
+          unit: '1 kg',
+          quantity: 3,
+          image: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 114
+        },
+        {
+          productId: 'prod_potato_jyoti',
+          name: 'Fresh Jyoti Potato (Aloo)',
+          price: 32,
+          unit: '1 kg',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 64
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Rahul Sharma',
+        phone: '+91 98765 43210',
+        house: 'Flat 402, Gokul Residency',
+        street: 'Manor Road',
+        area: 'Navali',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near D-Mart'
+      },
+      paymentMethod: 'Cash on Delivery',
+      paymentStatus: 'Pending',
+      orderStatus: 'Out for Delivery',
+      subtotal: 258,
+      deliveryFee: 40,
+      discount: 20,
+      totalAmount: 278,
+      estimatedDelivery: 'Today within 45 mins',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 3 * oneHour).toISOString(), note: 'Order received by vendor' },
+        { status: 'Confirmed', timestamp: new Date(now - 2 * oneHour).toISOString(), note: 'Vendor verified inventory' },
+        { status: 'Preparing', timestamp: new Date(now - 1.5 * oneHour).toISOString(), note: 'Handpicked fresh from crates' },
+        { status: 'Out for Delivery', timestamp: new Date(now - 30 * 60 * 1000).toISOString(), note: 'Rider Santosh is on the way' }
+      ],
+      createdAt: new Date(now - 3 * oneHour).toISOString()
+    },
+    {
+      _id: 'FM20261002',
+      customerId: 'user_cust_01',
+      customerName: 'Rahul Sharma',
+      customerEmail: 'rahul@freshmart.com',
+      customerPhone: '+91 98765 43210',
+      items: [
+        {
+          productId: 'prod_mango_alphonso',
+          name: 'Ratnagiri Alphonso Mango (Hapus)',
+          price: 720,
+          unit: '1 kg',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 720
+        },
+        {
+          productId: 'prod_apple_shimla',
+          name: 'Shimla Royal Apple',
+          price: 150,
+          unit: '1 kg',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 150
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Rahul Sharma',
+        phone: '+91 98765 43210',
+        house: 'Flat 402, Gokul Residency',
+        street: 'Manor Road',
+        area: 'Navali',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near D-Mart'
+      },
+      paymentMethod: 'UPI',
+      paymentStatus: 'Paid',
+      orderStatus: 'Delivered',
+      subtotal: 870,
+      deliveryFee: 0,
+      discount: 50,
+      totalAmount: 820,
+      estimatedDelivery: 'Delivered yesterday',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 28 * oneHour).toISOString(), note: 'Order placed via UPI' },
+        { status: 'Confirmed', timestamp: new Date(now - 27 * oneHour).toISOString(), note: 'Confirmed' },
+        { status: 'Preparing', timestamp: new Date(now - 26 * oneHour).toISOString(), note: 'Packed with fruit foam nets' },
+        { status: 'Out for Delivery', timestamp: new Date(now - 25 * oneHour).toISOString(), note: 'Out for delivery' },
+        { status: 'Delivered', timestamp: new Date(now - 24 * oneHour).toISOString(), note: 'Delivered to recipient with OTP' }
+      ],
+      createdAt: new Date(now - 28 * oneHour).toISOString()
+    },
+    {
+      _id: 'FM20261003',
+      customerId: 'user_cust_02',
+      customerName: 'Priya Verma',
+      customerEmail: 'priya@gmail.com',
+      customerPhone: '+91 98111 22334',
+      items: [
+        {
+          productId: 'prod_spinach_palak',
+          name: 'Tender Baby Spinach (Palak)',
+          price: 28,
+          unit: '250 g',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 56
+        },
+        {
+          productId: 'prod_carrot_ooty',
+          name: 'Ooty Sweet Red Carrot',
+          price: 58,
+          unit: '1 kg',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 58
+        },
+        {
+          productId: 'prod_coriander_leaves',
+          name: 'Fresh Country Coriander (Kothmir)',
+          price: 18,
+          unit: '250 g',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 18
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Priya Verma',
+        phone: '+91 98111 22334',
+        house: 'Bungalow 12, Sunshine Colony',
+        street: 'Kelve Road',
+        area: 'Shirgaon',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401405',
+        landmark: 'Behind Saraswati School'
+      },
+      paymentMethod: 'Cash on Delivery',
+      paymentStatus: 'Pending',
+      orderStatus: 'Preparing',
+      subtotal: 132,
+      deliveryFee: 40,
+      discount: 0,
+      totalAmount: 172,
+      estimatedDelivery: 'Today by 5:00 PM',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 1 * oneHour).toISOString(), note: 'Order placed' },
+        { status: 'Confirmed', timestamp: new Date(now - 45 * 60 * 1000).toISOString(), note: 'Confirmed by store' },
+        { status: 'Preparing', timestamp: new Date(now - 20 * 60 * 1000).toISOString(), note: 'Being sorted and weighed' }
+      ],
+      createdAt: new Date(now - 1 * oneHour).toISOString()
+    },
+    {
+      _id: 'FM20261004',
+      customerId: 'user_cust_03',
+      customerName: 'Amit Joshi',
+      customerEmail: 'amit.j@yahoo.com',
+      customerPhone: '+91 99223 34455',
+      items: [
+        {
+          productId: 'prod_pomegranate_aril',
+          name: 'Bhagwa Ruby Pomegranate (Anar)',
+          price: 185,
+          unit: '1 kg',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1541344999736-83eca272f6fc?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 370
+        },
+        {
+          productId: 'prod_orange_nagpur',
+          name: 'Nagpur Sweet Orange (Santra)',
+          price: 90,
+          unit: '1 kg',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 180
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Amit Joshi',
+        phone: '+91 99223 34455',
+        house: 'Row House 5, Green Meadows',
+        street: 'Mahim Road',
+        area: 'Tembi',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near Sai Baba Mandir'
+      },
+      paymentMethod: 'Online Payment',
+      paymentStatus: 'Paid',
+      orderStatus: 'Confirmed',
+      subtotal: 550,
+      deliveryFee: 0,
+      discount: 30,
+      totalAmount: 520,
+      estimatedDelivery: 'Today by 6:30 PM',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 30 * 60 * 1000).toISOString(), note: 'Payment verified' },
+        { status: 'Confirmed', timestamp: new Date(now - 15 * 60 * 1000).toISOString(), note: 'Vendor accepted order' }
+      ],
+      createdAt: new Date(now - 30 * 60 * 1000).toISOString()
+    },
+    {
+      _id: 'FM20261005',
+      customerId: 'user_cust_04',
+      customerName: 'Sneha Kulkarni',
+      customerEmail: 'sneha.k@outlook.com',
+      customerPhone: '+91 97654 32190',
+      items: [
+        {
+          productId: 'prod_watermelon_kiran',
+          name: 'Sweet Striped Watermelon',
+          price: 79,
+          unit: 'Per piece',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 79
+        },
+        {
+          productId: 'prod_banana_robusta',
+          name: 'Robusta Golden Banana',
+          price: 48,
+          unit: '1 kg',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 96
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Sneha Kulkarni',
+        phone: '+91 97654 32190',
+        house: 'A-201, Royal Palms',
+        street: 'Boisar Link Road',
+        area: 'Palghar East',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near Municipal Garden'
+      },
+      paymentMethod: 'UPI',
+      paymentStatus: 'Paid',
+      orderStatus: 'Placed',
+      subtotal: 175,
+      deliveryFee: 40,
+      discount: 0,
+      totalAmount: 215,
+      estimatedDelivery: 'Tomorrow Morning',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 10 * 60 * 1000).toISOString(), note: 'Order placed by customer' }
+      ],
+      createdAt: new Date(now - 10 * 60 * 1000).toISOString()
+    },
+    {
+      _id: 'FM20261006',
+      customerId: 'user_cust_05',
+      customerName: 'Vikram Deshmukh',
+      customerEmail: 'vikram.d@gmail.com',
+      customerPhone: '+91 98450 98765',
+      items: [
+        {
+          productId: 'prod_ladyfinger_bhindi',
+          name: 'Tender Fresh Okra (Bhindi)',
+          price: 45,
+          unit: '500 g',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1425543103986-22abb7d7e8d2?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 90
+        },
+        {
+          productId: 'prod_cauliflower_snowball',
+          name: 'Snowball Cauliflower (Phool Gobhi)',
+          price: 42,
+          unit: 'Per piece',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 42
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Vikram Deshmukh',
+        phone: '+91 98450 98765',
+        house: 'Plot 88, Sahyadri Nagar',
+        street: 'Old Post Office Lane',
+        area: 'Palghar City',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Opposite State Bank'
+      },
+      paymentMethod: 'Cash on Delivery',
+      paymentStatus: 'Paid',
+      orderStatus: 'Delivered',
+      subtotal: 132,
+      deliveryFee: 40,
+      discount: 0,
+      totalAmount: 172,
+      estimatedDelivery: 'Delivered',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 48 * oneHour).toISOString(), note: 'Placed' },
+        { status: 'Confirmed', timestamp: new Date(now - 47 * oneHour).toISOString(), note: 'Confirmed' },
+        { status: 'Preparing', timestamp: new Date(now - 46 * oneHour).toISOString(), note: 'Prepared' },
+        { status: 'Out for Delivery', timestamp: new Date(now - 45 * oneHour).toISOString(), note: 'Out for delivery' },
+        { status: 'Delivered', timestamp: new Date(now - 44 * oneHour).toISOString(), note: 'Delivered' }
+      ],
+      createdAt: new Date(now - 48 * oneHour).toISOString()
+    },
+    {
+      _id: 'FM20261007',
+      customerId: 'user_cust_02',
+      customerName: 'Priya Verma',
+      customerEmail: 'priya@gmail.com',
+      customerPhone: '+91 98111 22334',
+      items: [
+        {
+          productId: 'prod_grapes_green',
+          name: 'Nashik Thompson Green Grapes',
+          price: 99,
+          unit: '500 g',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 198
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Priya Verma',
+        phone: '+91 98111 22334',
+        house: 'Bungalow 12, Sunshine Colony',
+        street: 'Kelve Road',
+        area: 'Shirgaon',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401405',
+        landmark: 'Behind Saraswati School'
+      },
+      paymentMethod: 'Cash on Delivery',
+      paymentStatus: 'Cancelled',
+      orderStatus: 'Cancelled',
+      subtotal: 198,
+      deliveryFee: 40,
+      discount: 0,
+      totalAmount: 238,
+      estimatedDelivery: 'Cancelled',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 72 * oneHour).toISOString(), note: 'Placed' },
+        { status: 'Cancelled', timestamp: new Date(now - 71 * oneHour).toISOString(), note: 'Cancelled by customer: Travelling out of town' }
+      ],
+      createdAt: new Date(now - 72 * oneHour).toISOString()
+    },
+    {
+      _id: 'FM20261008',
+      customerId: 'user_cust_03',
+      customerName: 'Amit Joshi',
+      customerEmail: 'amit.j@yahoo.com',
+      customerPhone: '+91 99223 34455',
+      items: [
+        {
+          productId: 'prod_apple_shimla',
+          name: 'Shimla Royal Apple',
+          price: 150,
+          unit: '1 kg',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 300
+        },
+        {
+          productId: 'prod_papaya_red',
+          name: 'Red Lady Papaya',
+          price: 55,
+          unit: 'Per piece',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 110
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Amit Joshi',
+        phone: '+91 99223 34455',
+        house: 'Row House 5, Green Meadows',
+        street: 'Mahim Road',
+        area: 'Tembi',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near Sai Baba Mandir'
+      },
+      paymentMethod: 'UPI',
+      paymentStatus: 'Paid',
+      orderStatus: 'Delivered',
+      subtotal: 410,
+      deliveryFee: 40,
+      discount: 0,
+      totalAmount: 450,
+      estimatedDelivery: 'Delivered',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 5 * oneDay).toISOString(), note: 'Order confirmed' },
+        { status: 'Delivered', timestamp: new Date(now - 5 * oneDay + 2 * oneHour).toISOString(), note: 'Delivered' }
+      ],
+      createdAt: new Date(now - 5 * oneDay).toISOString()
+    },
+    {
+      _id: 'FM20261009',
+      customerId: 'user_cust_04',
+      customerName: 'Sneha Kulkarni',
+      customerEmail: 'sneha.k@outlook.com',
+      customerPhone: '+91 97654 32190',
+      items: [
+        {
+          productId: 'prod_tomato_hybrid',
+          name: 'Fresh Farm Hybrid Tomato',
+          price: 40,
+          unit: '1 kg',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 40
+        },
+        {
+          productId: 'prod_capsicum_green',
+          name: 'Shimla Green Bell Pepper (Capsicum)',
+          price: 60,
+          unit: '500 g',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 60
+        },
+        {
+          productId: 'prod_green_chilli',
+          name: 'Spicy Green Chilli (Hari Mirch)',
+          price: 22,
+          unit: '250 g',
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 22
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Sneha Kulkarni',
+        phone: '+91 97654 32190',
+        house: 'A-201, Royal Palms',
+        street: 'Boisar Link Road',
+        area: 'Palghar East',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Near Municipal Garden'
+      },
+      paymentMethod: 'Cash on Delivery',
+      paymentStatus: 'Paid',
+      orderStatus: 'Delivered',
+      subtotal: 122,
+      deliveryFee: 40,
+      discount: 0,
+      totalAmount: 162,
+      estimatedDelivery: 'Delivered',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 6 * oneDay).toISOString(), note: 'Placed' },
+        { status: 'Delivered', timestamp: new Date(now - 6 * oneDay + 3 * oneHour).toISOString(), note: 'Delivered' }
+      ],
+      createdAt: new Date(now - 6 * oneDay).toISOString()
+    },
+    {
+      _id: 'FM20261010',
+      customerId: 'user_cust_05',
+      customerName: 'Vikram Deshmukh',
+      customerEmail: 'vikram.d@gmail.com',
+      customerPhone: '+91 98450 98765',
+      items: [
+        {
+          productId: 'prod_mango_alphonso',
+          name: 'Ratnagiri Alphonso Mango (Hapus)',
+          price: 720,
+          unit: '1 kg',
+          quantity: 2,
+          image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=600&auto=format&fit=crop&q=80',
+          itemTotal: 1440
+        }
+      ],
+      deliveryAddress: {
+        fullName: 'Vikram Deshmukh',
+        phone: '+91 98450 98765',
+        house: 'Plot 88, Sahyadri Nagar',
+        street: 'Old Post Office Lane',
+        area: 'Palghar City',
+        city: 'Palghar',
+        state: 'Maharashtra',
+        pincode: '401404',
+        landmark: 'Opposite State Bank'
+      },
+      paymentMethod: 'Online Payment',
+      paymentStatus: 'Paid',
+      orderStatus: 'Delivered',
+      subtotal: 1440,
+      deliveryFee: 0,
+      discount: 100,
+      totalAmount: 1340,
+      estimatedDelivery: 'Delivered',
+      statusHistory: [
+        { status: 'Placed', timestamp: new Date(now - 7 * oneDay).toISOString(), note: 'Placed' },
+        { status: 'Delivered', timestamp: new Date(now - 7 * oneDay + 4 * oneHour).toISOString(), note: 'Delivered' }
+      ],
+      createdAt: new Date(now - 7 * oneDay).toISOString()
+    }
+  ];
+
+  // 6. Reviews
+  const seedReviews = [
+    {
+      _id: 'rev_1',
+      productId: 'prod_tomato_hybrid',
+      userName: 'Aarti S.',
+      rating: 5,
+      comment: 'Super fresh! Not a single damaged piece. The taste was truly farm-fresh compared to supermarkets.',
+      createdAt: new Date(now - 2 * oneDay).toISOString()
+    },
+    {
+      _id: 'rev_2',
+      productId: 'prod_mango_alphonso',
+      userName: 'Rahul Sharma',
+      rating: 5,
+      comment: 'Authentic Ratnagiri fragrance! Melted in the mouth. Ramesh ji personally packed them carefully.',
+      createdAt: new Date(now - 1 * oneDay).toISOString()
+    },
+    {
+      _id: 'rev_3',
+      productId: 'prod_spinach_palak',
+      userName: 'Dr. Madhav',
+      rating: 5,
+      comment: 'Leaves were crisp with zero yellowing. Cleaned very quickly. Very pleased with 2-hour doorstep delivery.',
+      createdAt: new Date(now - 3 * oneDay).toISOString()
+    }
+  ];
+
+  db.resetWithData({
+    users: seedUsers,
+    categories: seedCategories,
+    products: seedProducts,
+    stores: seedStore,
+    orders: seedOrders,
+    reviews: seedReviews
+  });
+
+  console.log(`[Seed] Seeded ${seedProducts.length} products, ${seedCategories.length} categories, ${seedUsers.length} users, and ${seedOrders.length} orders successfully.`);
+};
